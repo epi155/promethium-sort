@@ -23,7 +23,7 @@ public interface SortEngine {
     }
 
     /**
-     * Set the sort context (maxThread := nmCore / 2)
+     * Set the sort context (maxThread = nmCore / 2)
      *
      * @param maxNumRecord max record sorted in memory
      * @param charset      file charset
@@ -35,7 +35,7 @@ public interface SortEngine {
     }
 
     /**
-     * Set the sort context (charset := UTF-8; maxThread := nmCore / 2)
+     * Set the sort context (charset = UTF-8; maxThread = nmCore / 2)
      *
      * @param maxNumRecord max record sorted in memory
      * @return {@link LayerSortIn} instance

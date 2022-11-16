@@ -24,7 +24,7 @@
         <maven.compiler.release>${java.version}</maven.compiler.release>
     </properties>
 
-    <name>Language extension</name>
+    <name>File Sort</name>
     <description>Sort file utility</description>
     <url>https://github.com/epi155/promethium-sort</url>
 
