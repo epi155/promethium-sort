@@ -8,7 +8,8 @@ import java.nio.charset.Charset;
 /**
  * Sort Factory
  */
-public interface SortEngine {
+public abstract class SortEngine {
+    private SortEngine() {}
     /**
      * Set the sort context
      *
@@ -18,7 +19,7 @@ public interface SortEngine {
      * @return {@link LayerSortIn} instance
      */
     @Contract(value = "_, _, _ -> new", pure = true)
-    static @NotNull LayerSortIn using(int maxNumRecord, @NotNull Charset charset, int maxThread) {
+    public static @NotNull LayerSortIn using(int maxNumRecord, @NotNull Charset charset, int maxThread) {
         return new PmSortEngine(maxNumRecord, charset, maxThread);
     }
 
@@ -30,7 +31,7 @@ public interface SortEngine {
      * @return {@link LayerSortIn} instance
      */
     @Contract("_, _ -> new")
-    static @NotNull LayerSortIn using(int maxNumRecord, @NotNull Charset charset) {
+    public static @NotNull LayerSortIn using(int maxNumRecord, @NotNull Charset charset) {
         return new PmSortEngine(maxNumRecord, charset);
     }
 
@@ -41,7 +42,7 @@ public interface SortEngine {
      * @return {@link LayerSortIn} instance
      */
     @Contract("_ -> new")
-    static @NotNull LayerSortIn using(int maxNumRecord) {
+    public static @NotNull LayerSortIn using(int maxNumRecord) {
         return new PmSortEngine(maxNumRecord);
     }
 }

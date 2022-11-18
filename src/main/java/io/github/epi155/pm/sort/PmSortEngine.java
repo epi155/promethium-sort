@@ -14,9 +14,6 @@ import java.util.*;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Phaser;
-import java.util.function.Predicate;
-import java.util.function.UnaryOperator;
-import java.util.stream.Collectors;
 
 @Slf4j
 class PmSortEngine implements LayerSortIn {
@@ -47,8 +44,8 @@ class PmSortEngine implements LayerSortIn {
 
     private class PmSortIn implements LayerSkipRecord {
         private final File source;
-        private UnaryOperator<String> inRecFcn = null;
-        private Predicate<String> includeFilter = null;
+        private RecordEditor inRecFcn = null;
+        private SortFilter includeFilter = null;
         private int nmSkip = 0;
         private int nmStop = Integer.MAX_VALUE;
 
@@ -57,13 +54,13 @@ class PmSortEngine implements LayerSortIn {
         }
 
         @Override
-        public @NotNull LayerSort inRec(@NotNull UnaryOperator<String> inFcn) {
+        public @NotNull LayerSort inRec(@NotNull RecordEditor inFcn) {
             this.inRecFcn = inFcn;
             return this;
         }
 
         @Override
-        public @NotNull LayerStopAfter include(@NotNull Predicate<String> test) {
+        public @NotNull LayerStopAfter include(@NotNull SortFilter test) {
             this.includeFilter = test;
             return this;
         }
@@ -87,7 +84,7 @@ class PmSortEngine implements LayerSortIn {
 
         private class PmSort implements LayerOutRec {
             private final Comparator<String> comparator;
-            private UnaryOperator<String> outRecFcn = null;
+            private RecordEditor outRecFcn = null;
             private File target;
 
             public PmSort(Comparator<String> comparator) {
@@ -95,7 +92,7 @@ class PmSortEngine implements LayerSortIn {
             }
 
             @Override
-            public @NotNull LayerSortOut outRec(@NotNull UnaryOperator<String> outFcn) {
+            public @NotNull LayerSortOut outRec(@NotNull RecordEditor outFcn) {
                 this.outRecFcn = outFcn;
                 return this;
             }
@@ -156,15 +153,14 @@ class PmSortEngine implements LayerSortIn {
                 Splitter splitter = this.new Splitter();
                 try (BufferedReader br = Files.newBufferedReader(source.toPath(), charset)) {
                     String line;
-                    while ((line = br.readLine()) != null) {
+                    while (nmRecWr < nmStop && (line = br.readLine()) != null) {
+                        if (line.length() == 1 && line.charAt(0) == '\u001a')
+                            break;
                         nmRecRd++;
                         if (nmRecRd > nmSkip &&
                             splitter.process(line)) {
                             nmRecWr++;
                         }
-                        if (nmRecWr >= nmStop ||
-                            line.length() == 1 && line.charAt(0) == '\u001a')
-                            break;
                     }
                     return splitter.files();
                 } catch (IOException e) {
@@ -227,12 +223,7 @@ class PmSortEngine implements LayerSortIn {
                                 line1 = br1.readLine();
                             } else {
                                 int comp = comparator.compare(line1, line2);
-                                if (comp == 0) {
-                                    writeLn(wrt, line1);
-                                    writeLn(wrt, line2);
-                                    line1 = br1.readLine();
-                                    line2 = br2.readLine();
-                                } else if (comp < 0) {
+                                if (comp <= 0) {    // sort stability: File_k < File_{k+1} !!
                                     writeLn(wrt, line1);
                                     line1 = br1.readLine();
                                 } else /* comp > 0 */ {
@@ -297,7 +288,7 @@ class PmSortEngine implements LayerSortIn {
                 }
 
                 private File sortAndSave(@NotNull List<String> data) {
-                    data.sort(comparator);
+                    Collections.sort(data, comparator);
                     File file;
                     try {
                         file = File.createTempFile(PRFX, SUFX);
@@ -310,20 +301,35 @@ class PmSortEngine implements LayerSortIn {
                 }
 
                 private void sortAndFinalSave(@NotNull List<String> data, File file) {
-                    data.sort(comparator);
-                    if (outRecFcn != null)
-                        data = data.stream().map(it -> outRecFcn.apply(it)).collect(Collectors.toList());
+                    Collections.sort(data, comparator);
+                    if (outRecFcn != null) {
+                        List<String> good = new ArrayList<>();
+                        for(String line: data) {
+                            good.add(outRecFcn.apply(line));
+                        }
+                        data = good;
+                    }
                     save(data, file);
                 }
 
                 public List<File> files() {
                     if (data.isEmpty()) {
-                        return Collections.emptyList();
-                    } else {
+                        // no data pending (no save required)
                         if (splitFiles.isEmpty()) {
+                            // no file at all
+                            return Collections.emptyList();
+                        } else {
+                            // all file filled completely
+                            return splitFiles;
+                        }
+                    } else {
+                        // some pending data
+                        if (splitFiles.isEmpty()) {
+                            // no file by now -> all one file
                             sortAndFinalSave(data, target);
                             return Collections.singletonList(target);
                         } else {
+                            // add remainder
                             File chunk = sortAndSave(data);
                             splitFiles.add(chunk);
                             return splitFiles;
@@ -332,7 +338,5 @@ class PmSortEngine implements LayerSortIn {
                 }
             }
         }
-
     }
-
 }
