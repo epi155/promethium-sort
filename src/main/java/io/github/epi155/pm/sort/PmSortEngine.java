@@ -42,7 +42,7 @@ class PmSortEngine implements LayerSortIn {
         return this.new PmSortIn(unsortedFile);
     }
 
-    private class PmSortIn implements LayerSkipRecord {
+    private class PmSortIn extends PmLayerSort implements LayerSkipRecord {
         private final File source;
         private RecordEditor inRecFcn = null;
         private SortFilter includeFilter = null;

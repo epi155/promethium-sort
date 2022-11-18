@@ -69,19 +69,13 @@ public class TestSort {
                 return (((int) line.charAt(line.length() - 1)) & 0x01) == 0;
             }
         };
-        Comparator<String> comp = new Comparator<String>() {
-            @Override
-            public int compare(String o1, String o2) {
-                return o1.compareTo(o2);
-            }
-        };
         SortEngine.using(12, StandardCharsets.US_ASCII)
             .sortIn(source)
             .skipRecord(100)
             .include(filter)
             .stopAfter(30)
             .inRec(editIn)
-            .sort(comp)
+            .sort()
             .outRec(editOut)
             .sortOut(target);
 
@@ -91,12 +85,7 @@ public class TestSort {
             .include(filter)
             .stopAfter(30)
             .inRec(editIn)
-            .sort(new Comparator<String>() {
-                @Override
-                public int compare(String o1, String o2) {
-                    return o1.compareTo(o2);
-                }
-            })
+            .sort()
             .outRec(editOut)
             .sortOut(target);
 
@@ -106,12 +95,7 @@ public class TestSort {
             .include(filter)
             .stopAfter(30)
             .inRec(editIn)
-            .sort(new Comparator<String>() {
-                @Override
-                public int compare(String o1, String o2) {
-                    return o1.compareTo(o2);
-                }
-            })
+            .sort()
             .outRec(editOut)
             .sortOut(target);
     }
