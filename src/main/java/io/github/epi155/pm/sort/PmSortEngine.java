@@ -314,18 +314,12 @@ class PmSortEngine implements LayerSortIn {
 
                 public List<File> files() {
                     if (data.isEmpty()) {
-                        // no data pending (no save required)
-                        if (splitFiles.isEmpty()) {
-                            // no file at all
-                            return Collections.emptyList();
-                        } else {
-                            // all file filled completely
-                            return splitFiles;
-                        }
+                        // no data pending (no save required), return as-is
+                        return splitFiles;
                     } else {
                         // some pending data
                         if (splitFiles.isEmpty()) {
-                            // no file by now -> all one file
+                            // no file for now -> all in one file (the final one)
                             sortAndFinalSave(data, target);
                             return Collections.singletonList(target);
                         } else {

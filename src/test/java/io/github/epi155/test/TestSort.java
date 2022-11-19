@@ -4,8 +4,10 @@ import io.github.epi155.pm.sort.RecordEditor;
 import io.github.epi155.pm.sort.SortEngine;
 import io.github.epi155.pm.sort.SortException;
 import io.github.epi155.pm.sort.SortFilter;
+import org.junit.Assert;
 import org.junit.Test;
 
+import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.File;
 import java.io.IOException;
@@ -16,7 +18,7 @@ import java.util.Comparator;
 import java.util.Random;
 
 public class TestSort {
-    @Test(expected = Test.None.class /* no exception expected */)
+    @Test
     public void testNumSort() throws IOException {
         final File source = File.createTempFile("rand-", ".txt");
         Random random = new Random();
@@ -37,9 +39,23 @@ public class TestSort {
                     return o1.compareTo(o2);
                 }
             }).sortOut(target);
+        verifyOrder(target);
     }
 
-    @Test(expected = Test.None.class /* no exception expected */)
+    private void verifyOrder(File target) throws IOException {
+        try(BufferedReader br = Files.newBufferedReader(Paths.get(target.getAbsolutePath()), StandardCharsets.ISO_8859_1)) {
+            String oldLine = null;
+            String line;
+            while ((line = br.readLine()) != null) {
+                if (oldLine != null) {
+                    Assert.assertTrue("error: \n"+oldLine+"\n"+line, oldLine.compareTo(line) <= 0);
+                }
+                oldLine = line;
+            }
+        }
+    }
+
+    @Test
     public void testNum() throws IOException {
         final File source = File.createTempFile("bef-", ".txt");
         try (BufferedWriter bw = Files.newBufferedWriter(Paths.get(source.getAbsolutePath()), StandardCharsets.US_ASCII)) {
@@ -78,6 +94,7 @@ public class TestSort {
             .sort()
             .outRec(editOut)
             .sortOut(target);
+        verifyOrder(target);
 
         SortEngine.using(12, StandardCharsets.US_ASCII)
             .sortIn(source)
@@ -88,6 +105,7 @@ public class TestSort {
             .sort()
             .outRec(editOut)
             .sortOut(target);
+        verifyOrder(target);
 
         SortEngine.using(100, StandardCharsets.US_ASCII)
             .sortIn(source)
@@ -98,9 +116,10 @@ public class TestSort {
             .sort()
             .outRec(editOut)
             .sortOut(target);
+        verifyOrder(target);
     }
 
-    @Test(expected = Test.None.class /* no exception expected */)
+    @Test
     public void testNum2() throws IOException {
         final File source = File.createTempFile("bef-", ".txt");
         try (BufferedWriter bw = Files.newBufferedWriter(Paths.get(source.getAbsolutePath()), StandardCharsets.US_ASCII)) {
@@ -119,6 +138,7 @@ public class TestSort {
                 }
             })
             .sortOut(target);
+        verifyOrder(target);
     }
     @Test(expected = SortException.class)
     public void testNum3() throws IOException {
@@ -139,8 +159,9 @@ public class TestSort {
                 }
             })
             .sortOut(target);
+        verifyOrder(target);
     }
-    @Test(expected = Test.None.class /* no exception expected */)
+    @Test
     public void testNum4() throws IOException {
         final File source = File.createTempFile("bef-", ".txt");
         try (BufferedWriter bw = Files.newBufferedWriter(Paths.get(source.getAbsolutePath()), StandardCharsets.US_ASCII)) {
@@ -160,8 +181,9 @@ public class TestSort {
             .sortIn(source)
             .sort(comp)
             .sortOut(target);
+        verifyOrder(target);
     }
-    @Test(expected = Test.None.class /* no exception expected */)
+    @Test
     public void testNum5() throws IOException {
         final File source = File.createTempFile("bef-", ".txt");
         try (BufferedWriter bw = Files.newBufferedWriter(Paths.get(source.getAbsolutePath()), StandardCharsets.US_ASCII)) {
@@ -181,5 +203,19 @@ public class TestSort {
             .sortIn(source)
             .sort(comp)
             .sortOut(target);
+        verifyOrderReverse(target);
+    }
+
+    private void verifyOrderReverse(File target) throws IOException {
+        try(BufferedReader br = Files.newBufferedReader(Paths.get(target.getAbsolutePath()), StandardCharsets.ISO_8859_1)) {
+            String oldLine = null;
+            String line;
+            while ((line = br.readLine()) != null) {
+                if (oldLine != null) {
+                    Assert.assertTrue("error: \n"+oldLine+"\n"+line, oldLine.compareTo(line) >= 0);
+                }
+                oldLine = line;
+            }
+        }
     }
 }
