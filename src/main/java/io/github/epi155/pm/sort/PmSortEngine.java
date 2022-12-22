@@ -2,6 +2,7 @@ package io.github.epi155.pm.sort;
 
 import lombok.extern.slf4j.Slf4j;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
@@ -72,7 +73,7 @@ class PmSortEngine implements LayerSortIn {
         }
 
         @Override
-        public @NotNull LayerOutRec sort(@NotNull Comparator<String> comparator) {
+        public @NotNull LayerPostSort sort(@NotNull Comparator<String> comparator) {
             return this.new PmSort(comparator);
         }
 
@@ -82,10 +83,11 @@ class PmSortEngine implements LayerSortIn {
             return this;
         }
 
-        private class PmSort implements LayerOutRec {
+        private class PmSort implements LayerPostSort {
             private final Comparator<String> comparator;
             private RecordEditor outRecFcn = null;
             private File target;
+            private StringReorgWriter reorgWriter = null;
 
             public PmSort(Comparator<String> comparator) {
                 this.comparator = comparator;
@@ -168,6 +170,24 @@ class PmSortEngine implements LayerSortIn {
                 }
             }
 
+            @Override
+            public LayerOutRec allDups() {
+                this.reorgWriter = this.new AllDupsReorgWriter();
+                return this;
+            }
+
+            @Override
+            public LayerOutRec noDups() {
+                this.reorgWriter = this.new NoDupsReorgWriter();
+                return this;
+            }
+
+            @Override
+            public LayerOutRec first() {
+                this.reorgWriter = this.new FirstReorgWriter();
+                return this;
+            }
+
             private class MergeTask implements Runnable {
                 private final File src1;
                 private final File src2;
@@ -232,9 +252,14 @@ class PmSortEngine implements LayerSortIn {
                                 }
                             }
                         }
+                        flush(wrt);
                     } catch (IOException e) {
                         throw new SortException(e, "Error merging file {},{} -> {}", src1.getName(), src2.getName(), dest.getName());
                     }
+                }
+
+                protected void flush(@NotNull BufferedWriter wrt) throws IOException {
+                    // could be overwritten
                 }
 
                 protected void writeLn(@NotNull BufferedWriter wrt, String line) throws IOException {
@@ -250,9 +275,24 @@ class PmSortEngine implements LayerSortIn {
 
                 @Override
                 protected void writeLn(@NotNull BufferedWriter wrt, String line) throws IOException {
-                    if (outRecFcn != null)
-                        line = outRecFcn.apply(line);
-                    super.writeLn(wrt, line);
+                    String stuff = reorgWriter ==null ? line : reorgWriter.reorg(line);
+                    if (stuff != null) {
+                        if (outRecFcn != null)
+                            stuff = outRecFcn.apply(stuff);
+                        super.writeLn(wrt, stuff);
+                    }
+                }
+
+                @Override
+                protected void flush(@NotNull BufferedWriter wrt) throws IOException {
+                    if (reorgWriter != null) {
+                        String stuff = reorgWriter.flush();
+                        if (stuff != null) {
+                            if (outRecFcn != null)
+                                stuff = outRecFcn.apply(stuff);
+                            super.writeLn(wrt, stuff);
+                        }
+                    }
                 }
             }
 
@@ -302,6 +342,9 @@ class PmSortEngine implements LayerSortIn {
 
                 private void sortAndFinalSave(@NotNull List<String> data, File file) {
                     Collections.sort(data, comparator);
+                    if (reorgWriter != null) {
+                        data = reorg(data);
+                    }
                     if (outRecFcn != null) {
                         List<String> good = new ArrayList<>();
                         for(String line: data) {
@@ -310,6 +353,19 @@ class PmSortEngine implements LayerSortIn {
                         data = good;
                     }
                     save(data, file);
+                }
+
+                private List<String> reorg(List<String> data) {
+                    List<String> roll = new ArrayList<>();
+                    for(String line: data) {
+                        String temp = reorgWriter.reorg(line);
+                        if (temp != null)
+                            roll.add(temp);
+                    }
+                    String temp = reorgWriter.flush();
+                    if (temp != null)
+                        roll.add(temp);
+                    return roll;
                 }
 
                 public List<File> files() {
@@ -331,6 +387,107 @@ class PmSortEngine implements LayerSortIn {
                     }
                 }
             }
+
+            private class FirstReorgWriter implements StringReorgWriter {
+                private String cache = null;
+                @Nullable
+                @Override
+                public String reorg(@NotNull String line) {
+                    if (cache == null || comparator.compare(cache, line) != 0) {
+                        cache = line;
+                        return line;
+                    } else {
+                        return null;
+                    }
+                }
+
+                @Nullable
+                @Override
+                public String flush() {
+                    return null;
+                }
+            }
+
+            private class AllDupsReorgWriter implements StringReorgWriter {
+                private String cache = null;
+                private boolean pendingWrite;
+                @Nullable
+                @Override
+                public String reorg(@NotNull String line) {
+                    if (cache == null) {
+                        cache = line;
+                        pendingWrite = false;
+                        return null;
+                    } else {
+                        if (comparator.compare(cache, line) == 0) {
+                            String out = cache;
+                            cache = line;
+                            pendingWrite = true;
+                            return out;
+                        } else {
+                            if (pendingWrite) {
+                                String out = cache;
+                                cache = line;
+                                pendingWrite = false;
+                                return out;
+                            } else {
+                                cache = line;
+                                return null;
+                            }
+                        }
+                    }
+                }
+
+                @Nullable
+                @Override
+                public String flush() {
+                    if (pendingWrite) {
+                        pendingWrite = false;
+                        return cache;
+                    } else {
+                        return null;
+                    }
+                }
+            }
+
+            private class NoDupsReorgWriter implements StringReorgWriter {
+                private String cache = null;
+                private boolean pendingWrite;
+                @Nullable
+                @Override
+                public String reorg(@NotNull String line) {
+                    if (cache == null) {
+                        cache = line;
+                        pendingWrite = true;
+                        return null;
+                    } else {
+                        if (comparator.compare(cache, line) == 0) {
+                            pendingWrite = false;
+                            return null;
+                        } else {
+                            String out = cache;
+                            cache = line;
+                            pendingWrite = true;
+                            return out;
+                        }
+                    }
+                }
+
+                @Nullable
+                @Override
+                public String flush() {
+                    if (pendingWrite) {
+                        pendingWrite = false;
+                        return cache;
+                    } else {
+                        return null;
+                    }
+                }
+            }
         }
+    }
+    private interface StringReorgWriter {
+        @Nullable String reorg(@NotNull String line);
+        @Nullable String flush();
     }
 }

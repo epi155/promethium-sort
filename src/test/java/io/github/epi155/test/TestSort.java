@@ -218,4 +218,71 @@ public class TestSort {
             }
         }
     }
+
+    @Test
+    public void testNumSortDup() throws IOException {
+        final File source = File.createTempFile("rand-", ".txt");
+        Random random = new Random();
+        try (BufferedWriter bw = Files.newBufferedWriter(Paths.get(source.getAbsolutePath()), StandardCharsets.UTF_8)) {
+            for (int k = 0; k < 1000; k++) {
+                int n = random.nextInt(500);
+                bw.write(String.format("%10d%10d", n, k));
+                bw.newLine();
+            }
+        }
+        final File target = File.createTempFile("sort-", ".txt");
+        SortEngine.using(2048)
+            .sortIn(source)
+            .sort(new Comparator<String>() {
+                @Override
+                public int compare(String o1, String o2) {
+                    String s1 = o1.substring(0,10);
+                    String s2 = o2.substring(0,10);
+                    return s1.compareTo(s2);
+                }
+            })
+            .allDups()
+            .sortOut(target);
+        verifyOrder(target);
+    }
+    @Test
+    public void testNumSortNoDup() throws IOException {
+        final File source = File.createTempFile("rand-", ".txt");
+        Random random = new Random();
+        try (BufferedWriter bw = Files.newBufferedWriter(Paths.get(source.getAbsolutePath()), StandardCharsets.UTF_8)) {
+            for (int k = 0; k < 1000; k++) {
+                int n = random.nextInt(500);
+                bw.write(String.format("%10d", n));
+                bw.newLine();
+            }
+            bw.newLine();
+        }
+        final File target = File.createTempFile("sort-", ".txt");
+        SortEngine.using(256)
+            .sortIn(source)
+            .sort()
+            .noDups()
+            .sortOut(target);
+        verifyOrder(target);
+    }
+    @Test
+    public void testNumSortUnique() throws IOException {
+        final File source = File.createTempFile("rand-", ".txt");
+        Random random = new Random();
+        try (BufferedWriter bw = Files.newBufferedWriter(Paths.get(source.getAbsolutePath()), StandardCharsets.UTF_8)) {
+            for (int k = 0; k < 1000; k++) {
+                int n = random.nextInt(500);
+                bw.write(String.format("%10d", n));
+                bw.newLine();
+            }
+            bw.newLine();
+        }
+        final File target = File.createTempFile("sort-", ".txt");
+        SortEngine.using(256)
+            .sortIn(source)
+            .sort()
+            .first()
+            .sortOut(target);
+        verifyOrder(target);
+    }
 }

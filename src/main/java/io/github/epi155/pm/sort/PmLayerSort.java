@@ -13,7 +13,7 @@ abstract class PmLayerSort implements LayerSort {
     };
 
     @NotNull
-    public LayerOutRec sort() {
+    public LayerPostSort sort() {
         return sort(naturalOrder);
     }
 }

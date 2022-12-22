@@ -14,12 +14,12 @@ public interface LayerSort {
      * @param comparator sort comparator
      * @return {@link LayerOutRec} instance
      */
-    @NotNull LayerOutRec sort(@NotNull Comparator<String> comparator);
+    @NotNull LayerPostSort sort(@NotNull Comparator<String> comparator);
 
     /**
      * Sort the records using natural order
      *
      * @return {@link LayerOutRec} instance
      */
-    @NotNull LayerOutRec sort();
+    @NotNull LayerPostSort sort();
 }
