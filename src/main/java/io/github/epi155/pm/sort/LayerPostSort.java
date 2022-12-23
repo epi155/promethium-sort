@@ -1,7 +1,7 @@
 package io.github.epi155.pm.sort;
 
 /**
- * Layer to set the ALLDUPS, NODUPS, FIRST, OUTREC options and define the output file
+ * Layer to set the ALLDUPS, NODUPS, FIRST, LAST, FIRSTDUP, LASTDUP, OUTREC options and define the output file
  */
 public interface LayerPostSort extends LayerOutRec {
     /**
@@ -34,4 +34,35 @@ public interface LayerPostSort extends LayerOutRec {
      * @return {@link LayerOutRec} instance
      */
     LayerOutRec first();
+
+    /**
+     * Limits the records selected to those with KEY-SORT values that occur only once
+     * and the last record of those with KEY-SORT values that occur more than once.
+     * <p>
+     *     You can use this operand to keep just the last record for each unique field value.
+     * </p>
+     *
+     * @return {@link LayerOutRec} instance
+     */
+    LayerOutRec last();
+
+    /**
+     * Limits the records selected to the first record of those with KEY-SORT values that occur more than once.
+     * <p>
+     *     You can use this operand to keep just the first record of those records with duplicate field values.
+     * </p>
+     *
+     * @return {@link LayerOutRec} instance
+     */
+    LayerOutRec firstDup();
+
+    /**
+     * Limits the records selected to the last record of those with KEY-SORT values that occur more than once.
+     * <p>
+     *     You can use this operand to keep just the last record of those records with duplicate field values.
+     * </p>
+     *
+     * @return {@link LayerOutRec} instance
+     */
+    LayerOutRec lastDup();
 }

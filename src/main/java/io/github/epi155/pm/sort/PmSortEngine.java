@@ -188,6 +188,24 @@ class PmSortEngine implements LayerSortIn {
                 return this;
             }
 
+            @Override
+            public LayerOutRec last() {
+                this.reorgWriter = this.new LastReorgWriter();
+                return this;
+            }
+
+            @Override
+            public LayerOutRec firstDup() {
+                this.reorgWriter = this.new FirstDupReorgWriter();
+                return this;
+            }
+
+            @Override
+            public LayerOutRec lastDup() {
+                this.reorgWriter = this.new LastDupReorgWriter();
+                return this;
+            }
+
             private class MergeTask implements Runnable {
                 private final File src1;
                 private final File src2;
@@ -482,6 +500,85 @@ class PmSortEngine implements LayerSortIn {
                     } else {
                         return null;
                     }
+                }
+            }
+
+            private class LastReorgWriter implements StringReorgWriter {
+                private String cache = null;
+                @Nullable
+                @Override
+                public String reorg(@NotNull String line) {
+                    String out;
+                    if (cache == null || comparator.compare(cache, line) == 0) {
+                        out = null;
+                    } else {
+                        out = cache;
+                    }
+                    cache = line;
+                    return out;
+                }
+
+                @Nullable
+                @Override
+                public String flush() {
+                    return cache;
+                }
+            }
+
+            private class FirstDupReorgWriter implements StringReorgWriter {
+                private String cache = null;
+                private boolean isGarbage;
+                @Nullable
+                @Override
+                public String reorg(@NotNull String line) {
+                    String out;
+                    if (cache == null || comparator.compare(cache, line) != 0) {
+                        isGarbage = false;
+                        out = null;
+                    } else if (isGarbage) {
+                        out = null;
+                    } else {
+                        out = cache;
+                        isGarbage = true;
+                    }
+                    cache = line;
+                    return out;
+                }
+
+                @Nullable
+                @Override
+                public String flush() {
+                    return null;
+                }
+            }
+
+            private class LastDupReorgWriter implements StringReorgWriter {
+                private String cache = null;
+                private boolean isGarbage;
+                @Nullable
+                @Override
+                public String reorg(@NotNull String line) {
+                    String out;
+                    if (cache == null) {
+                        isGarbage = true;
+                        out = null;
+                    } else if (comparator.compare(cache, line) == 0) {
+                        isGarbage = false;
+                        out = null;
+                    } else if (isGarbage) {
+                        out = null;
+                    } else {
+                        isGarbage = true;
+                        out = cache;
+                    }
+                    cache = line;
+                    return out;
+                }
+
+                @Nullable
+                @Override
+                public String flush() {
+                    return isGarbage ? null : cache;
                 }
             }
         }

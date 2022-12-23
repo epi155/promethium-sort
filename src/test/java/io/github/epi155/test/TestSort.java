@@ -266,7 +266,7 @@ public class TestSort {
         verifyOrder(target);
     }
     @Test
-    public void testNumSortUnique() throws IOException {
+    public void testNumSortFirst() throws IOException {
         final File source = File.createTempFile("rand-", ".txt");
         Random random = new Random();
         try (BufferedWriter bw = Files.newBufferedWriter(Paths.get(source.getAbsolutePath()), StandardCharsets.UTF_8)) {
@@ -282,6 +282,66 @@ public class TestSort {
             .sortIn(source)
             .sort()
             .first()
+            .sortOut(target);
+        verifyOrder(target);
+    }
+    @Test
+    public void testNumSortLast() throws IOException {
+        final File source = File.createTempFile("rand-", ".txt");
+        Random random = new Random();
+        try (BufferedWriter bw = Files.newBufferedWriter(Paths.get(source.getAbsolutePath()), StandardCharsets.UTF_8)) {
+            for (int k = 0; k < 1000; k++) {
+                int n = random.nextInt(500);
+                bw.write(String.format("%10d", n));
+                bw.newLine();
+            }
+            bw.newLine();
+        }
+        final File target = File.createTempFile("sort-", ".txt");
+        SortEngine.using(256)
+            .sortIn(source)
+            .sort()
+            .last()
+            .sortOut(target);
+        verifyOrder(target);
+    }
+    @Test
+    public void testNumSortFirstDup() throws IOException {
+        final File source = File.createTempFile("rand-", ".txt");
+        Random random = new Random();
+        try (BufferedWriter bw = Files.newBufferedWriter(Paths.get(source.getAbsolutePath()), StandardCharsets.UTF_8)) {
+            for (int k = 0; k < 1000; k++) {
+                int n = random.nextInt(500);
+                bw.write(String.format("%10d", n));
+                bw.newLine();
+            }
+            bw.newLine();
+        }
+        final File target = File.createTempFile("sort-", ".txt");
+        SortEngine.using(256)
+            .sortIn(source)
+            .sort()
+            .firstDup()
+            .sortOut(target);
+        verifyOrder(target);
+    }
+    @Test
+    public void testNumSortLastDup() throws IOException {
+        final File source = File.createTempFile("rand-", ".txt");
+        Random random = new Random();
+        try (BufferedWriter bw = Files.newBufferedWriter(Paths.get(source.getAbsolutePath()), StandardCharsets.UTF_8)) {
+            for (int k = 0; k < 1000; k++) {
+                int n = random.nextInt(500);
+                bw.write(String.format("%10d", n));
+                bw.newLine();
+            }
+            bw.newLine();
+        }
+        final File target = File.createTempFile("sort-", ".txt");
+        SortEngine.using(256)
+            .sortIn(source)
+            .sort()
+            .lastDup()
             .sortOut(target);
         verifyOrder(target);
     }
