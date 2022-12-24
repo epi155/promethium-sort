@@ -345,4 +345,125 @@ public class TestSort {
             .sortOut(target);
         verifyOrder(target);
     }
+    @Test
+    public void testNumSortMix() throws IOException {
+        final File source = File.createTempFile("rand-", ".txt");
+        String[] as = {
+            "001001",
+            "001002",
+            "002003",
+            "003004",
+            "004005",
+            "004006",
+            "004007",
+        };
+        try (BufferedWriter bw = Files.newBufferedWriter(Paths.get(source.getAbsolutePath()), StandardCharsets.UTF_8)) {
+            for (String a: as) {
+                bw.write(a);
+                bw.newLine();
+            }
+        }
+        Comparator<String> com = new Comparator<String>() {
+            @Override
+            public int compare(String o1, String o2) {
+                return o1.substring(0, 3).compareTo(o2.substring(0, 3));
+            }
+        };
+        final File t1 = File.createTempFile("fd-", ".txt");
+        SortEngine.using(256)
+            .sortIn(source)
+            .sort(com)
+            .firstDup()
+            .sortOut(t1);
+        String[] s1 = arrayFromFile(t1);
+        String[] e1 = {
+            "001001",
+            "004005",
+        };
+        Assert.assertArrayEquals(e1, s1);
+
+        final File t2 = File.createTempFile("ld-", ".txt");
+        SortEngine.using(256)
+            .sortIn(source)
+            .sort(com)
+            .lastDup()
+            .sortOut(t2);
+        String[] s2 = arrayFromFile(t2);
+        String[] e2 = {
+            "001002",
+            "004007",
+        };
+        Assert.assertArrayEquals(e2, s2);
+
+        final File t3 = File.createTempFile("fx-", ".txt");
+        SortEngine.using(256)
+            .sortIn(source)
+            .sort(com)
+            .first()
+            .sortOut(t3);
+        String[] s3 = arrayFromFile(t3);
+        String[] e3 = {
+            "001001",
+            "002003",
+            "003004",
+            "004005",
+        };
+        Assert.assertArrayEquals(e3, s3);
+
+        final File t4 = File.createTempFile("lx-", ".txt");
+        SortEngine.using(256)
+            .sortIn(source)
+            .sort(com)
+            .last()
+            .sortOut(t4);
+        String[] s4 = arrayFromFile(t4);
+        String[] e4 = {
+            "001002",
+            "002003",
+            "003004",
+            "004007",
+        };
+        Assert.assertArrayEquals(e4, s4);
+
+        final File t5 = File.createTempFile("ad-", ".txt");
+        SortEngine.using(256)
+            .sortIn(source)
+            .sort(com)
+            .allDups()
+            .sortOut(t5);
+        String[] s5 = arrayFromFile(t5);
+        String[] e5 = {
+            "001001",
+            "001002",
+            "004005",
+            "004006",
+            "004007",
+        };
+        Assert.assertArrayEquals(e5, s5);
+
+        final File t6 = File.createTempFile("nd-", ".txt");
+        SortEngine.using(256)
+            .sortIn(source)
+            .sort(com)
+            .noDups()
+            .sortOut(t6);
+        String[] s6 = arrayFromFile(t6);
+        String[] e6 = {
+            "002003",
+            "003004",
+        };
+        Assert.assertArrayEquals(e6, s6);
+    }
+
+    private String[] arrayFromFile(File t1) {
+        String[] s1 = new String[0];
+        try {
+
+            byte[] bytes = Files.readAllBytes(t1.toPath());
+            s1 = new String (bytes).split("\n");
+        } catch (IOException e) {
+            //handle exception
+        }
+        return s1;
+    }
 }

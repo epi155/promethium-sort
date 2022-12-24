@@ -478,16 +478,14 @@ class PmSortEngine implements LayerSortIn {
                         cache = line;
                         pendingWrite = true;
                         return null;
+                    } else if (comparator.compare(cache, line) == 0) {
+                        pendingWrite = false;
+                        return null;
                     } else {
-                        if (comparator.compare(cache, line) == 0) {
-                            pendingWrite = false;
-                            return null;
-                        } else {
-                            String out = cache;
-                            cache = line;
-                            pendingWrite = true;
-                            return out;
-                        }
+                        String out = pendingWrite ? cache : null;
+                        cache = line;
+                        pendingWrite = true;
+                        return out;
                     }
                 }
 
