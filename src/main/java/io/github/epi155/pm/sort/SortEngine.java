@@ -1,6 +1,5 @@
 package io.github.epi155.pm.sort;
 
-import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 
 import java.io.File;
@@ -48,7 +47,7 @@ import java.util.Comparator;
  * Free disk space of at least twice the size of the original file is required.
  * </p>
  */
-public abstract class SortEngine {
+public class SortEngine {
     private SortEngine() {
     }
 
@@ -60,7 +59,6 @@ public abstract class SortEngine {
      * @param maxThread    max thread for merge split file
      * @return {@link LayerSortIn} instance
      */
-    @Contract(value = "_, _, _ -> new", pure = true)
     public static @NotNull LayerSortIn using(int maxNumRecord, @NotNull Charset charset, int maxThread) {
         return new PmSortEngine(maxNumRecord, charset, maxThread);
     }
@@ -72,7 +70,6 @@ public abstract class SortEngine {
      * @param charset      file charset
      * @return {@link LayerSortIn} instance
      */
-    @Contract("_, _ -> new")
     public static @NotNull LayerSortIn using(int maxNumRecord, @NotNull Charset charset) {
         return new PmSortEngine(maxNumRecord, charset);
     }
@@ -83,7 +80,6 @@ public abstract class SortEngine {
      * @param maxNumRecord max record sorted in memory
      * @return {@link LayerSortIn} instance
      */
-    @Contract("_ -> new")
     public static @NotNull LayerSortIn using(int maxNumRecord) {
         return new PmSortEngine(maxNumRecord);
     }

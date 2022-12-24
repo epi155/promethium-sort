@@ -1,6 +1,5 @@
 package io.github.epi155.pm.sort;
 
-import lombok.extern.slf4j.Slf4j;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -16,7 +15,6 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Phaser;
 
-@Slf4j
 class PmSortEngine implements LayerSortIn {
     private static final String PRFX = "sort-";
     private static final String SUFX = ".tmp";
@@ -166,7 +164,7 @@ class PmSortEngine implements LayerSortIn {
                     }
                     return splitter.files();
                 } catch (IOException e) {
-                    throw new SortException(e, "Error reading the file {}", source);
+                    throw new SortException(e, "Error reading the file %s", source.getAbsolutePath());
                 }
             }
 
@@ -223,19 +221,17 @@ class PmSortEngine implements LayerSortIn {
 
                 @Override
                 public void run() {
-                    log.trace("Merging {}/{} ...", src1.getName(), src2.getName());
                     try {
                         performMerge();
-                        log.trace("Merged into {}", dest.getName());
                         try {
                             Files.delete(src1.toPath());
                         } catch (IOException e) {
-                            log.error("Error deleting {}", src1.getName(), e);
+                            throw new SortException(e, "Error deleting temporary file %s", src1.getAbsolutePath());
                         }
                         try {
                             Files.delete(src2.toPath());
                         } catch (IOException e) {
-                            log.error("Error deleting {}", src2.getName(), e);
+                            throw new SortException(e, "Error deleting temporary file %s", src2.getAbsolutePath());
                         }
                     } finally {
                         phaser.arriveAndDeregister();
@@ -272,7 +268,10 @@ class PmSortEngine implements LayerSortIn {
                         }
                         flush(wrt);
                     } catch (IOException e) {
-                        throw new SortException(e, "Error merging file {},{} -> {}", src1.getName(), src2.getName(), dest.getName());
+                        throw new SortException(e, "Error merging file %s,%s -> %s",
+                            src1.getAbsolutePath(),
+                            src2.getAbsolutePath(),
+                            dest.getAbsolutePath());
                     }
                 }
 
@@ -341,7 +340,7 @@ class PmSortEngine implements LayerSortIn {
                             bw.newLine();
                         }
                     } catch (IOException e) {
-                        throw new SortException(e, "Error writing the file {}", file.getName());
+                        throw new SortException(e, "Error writing the file %s", file.getAbsolutePath());
                     }
                 }
 
