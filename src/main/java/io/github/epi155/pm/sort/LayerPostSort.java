@@ -39,7 +39,7 @@ public interface LayerPostSort extends LayerOutRec {
      * Limits the records selected to those with KEY-SORT values that occur only once
      * and the last record of those with KEY-SORT values that occur more than once.
      * <p>
-     *     You can use this operand to keep just the last record for each unique field value.
+     *     You can use this operand to keep just the last record for each <b>unique</b> field value.
      * </p>
      *
      * @return {@link LayerOutRec} instance
