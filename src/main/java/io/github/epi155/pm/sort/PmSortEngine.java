@@ -85,7 +85,7 @@ class PmSortEngine implements LayerSortIn {
             private final Comparator<String> comparator;
             private RecordEditor outRecFcn = null;
             private File target;
-            private StringReorgWriter reorgWriter = null;
+            private RecordAccumulator reorgWriter = null;
 
             public PmSort(Comparator<String> comparator) {
                 this.comparator = comparator;
@@ -204,6 +204,12 @@ class PmSortEngine implements LayerSortIn {
                 return this;
             }
 
+            @Override
+            public LayerOutRec reduce(RecordAccumulator accumulator) {
+                this.reorgWriter = accumulator;
+                return this;
+            }
+
             private class MergeTask implements Runnable {
                 private final File src1;
                 private final File src2;
@@ -292,7 +298,7 @@ class PmSortEngine implements LayerSortIn {
 
                 @Override
                 protected void writeLn(@NotNull BufferedWriter wrt, String line) throws IOException {
-                    String stuff = reorgWriter ==null ? line : reorgWriter.reorg(line);
+                    String stuff = reorgWriter ==null ? line : reorgWriter.reduce(line);
                     if (stuff != null) {
                         if (outRecFcn != null)
                             stuff = outRecFcn.apply(stuff);
@@ -375,7 +381,7 @@ class PmSortEngine implements LayerSortIn {
                 private List<String> reorg(List<String> data) {
                     List<String> roll = new ArrayList<>();
                     for(String line: data) {
-                        String temp = reorgWriter.reorg(line);
+                        String temp = reorgWriter.reduce(line);
                         if (temp != null)
                             roll.add(temp);
                     }
@@ -405,11 +411,11 @@ class PmSortEngine implements LayerSortIn {
                 }
             }
 
-            private class FirstReorgWriter implements StringReorgWriter {
+            private class FirstReorgWriter implements RecordAccumulator {
                 private String cache = null;
                 @Nullable
                 @Override
-                public String reorg(@NotNull String line) {
+                public String reduce(@NotNull String line) {
                     if (cache == null || comparator.compare(cache, line) != 0) {
                         cache = line;
                         return line;
@@ -425,12 +431,12 @@ class PmSortEngine implements LayerSortIn {
                 }
             }
 
-            private class AllDupsReorgWriter implements StringReorgWriter {
+            private class AllDupsReorgWriter implements RecordAccumulator {
                 private String cache = null;
                 private boolean pendingWrite;
                 @Nullable
                 @Override
-                public String reorg(@NotNull String line) {
+                public String reduce(@NotNull String line) {
                     if (cache == null) {
                         cache = line;
                         pendingWrite = false;
@@ -460,12 +466,12 @@ class PmSortEngine implements LayerSortIn {
                 }
             }
 
-            private class NoDupsReorgWriter implements StringReorgWriter {
+            private class NoDupsReorgWriter implements RecordAccumulator {
                 private String cache = null;
                 private boolean pendingWrite;
                 @Nullable
                 @Override
-                public String reorg(@NotNull String line) {
+                public String reduce(@NotNull String line) {
                     if (cache == null) {
                         cache = line;
                         pendingWrite = true;
@@ -493,11 +499,11 @@ class PmSortEngine implements LayerSortIn {
                 }
             }
 
-            private class LastReorgWriter implements StringReorgWriter {
+            private class LastReorgWriter implements RecordAccumulator {
                 private String cache = null;
                 @Nullable
                 @Override
-                public String reorg(@NotNull String line) {
+                public String reduce(@NotNull String line) {
                     String out;
                     if (cache == null || comparator.compare(cache, line) == 0) {
                         out = null;
@@ -515,12 +521,12 @@ class PmSortEngine implements LayerSortIn {
                 }
             }
 
-            private class FirstDupReorgWriter implements StringReorgWriter {
+            private class FirstDupReorgWriter implements RecordAccumulator {
                 private String cache = null;
                 private boolean isGarbage;
                 @Nullable
                 @Override
-                public String reorg(@NotNull String line) {
+                public String reduce(@NotNull String line) {
                     String out;
                     if (cache == null || comparator.compare(cache, line) != 0) {
                         isGarbage = false;
@@ -542,12 +548,12 @@ class PmSortEngine implements LayerSortIn {
                 }
             }
 
-            private class LastDupReorgWriter implements StringReorgWriter {
+            private class LastDupReorgWriter implements RecordAccumulator {
                 private String cache = null;
                 private boolean isGarbage;
                 @Nullable
                 @Override
-                public String reorg(@NotNull String line) {
+                public String reduce(@NotNull String line) {
                     String out;
                     if (cache == null) {
                         isGarbage = true;
@@ -572,9 +578,5 @@ class PmSortEngine implements LayerSortIn {
                 }
             }
         }
-    }
-    private interface StringReorgWriter {
-        @Nullable String reorg(@NotNull String line);
-        @Nullable String flush();
     }
 }
