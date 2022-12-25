@@ -36,6 +36,8 @@ import java.util.Comparator;
  * {@link LayerPostSort#last() last},
  * {@link LayerPostSort#lastDup() lastDup} ,
  * {@link LayerPostSort#noDups() noDups},
+ * {@link LayerPostSort#sum(SumFields) sum} 
+ * {@link LayerPostSort#reduce(RecordAccumulator) <i>reduce</i>},
  * {@link LayerOutRec#outRec(RecordEditor) outRec},
  * {@link LayerSortOut#sortOut(File) sortOut}.
  * </p>

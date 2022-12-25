@@ -205,6 +205,56 @@ class PmSortEngine implements LayerSortIn {
             }
 
             @Override
+            public LayerOutRec sum(final SumFields rule) {
+                class SumFiledsRule extends SumFields implements RecordAccumulator {
+                    private String cache = null;
+
+                    @Nullable
+                    @Override
+                    public String reduce(@NotNull String line) {
+                        String out;
+                        if (cache == null ) {
+                            out = null;
+                            cache = line;
+                            reset();
+                        } else if (comparator.compare(cache, line) == 0) {
+                            out = null;
+                        } else {
+                            out = getSummary(cache);
+                            reset();
+                            cache = line;
+                        }
+                        add(line);
+                        return out;
+                    }
+
+                    @Nullable
+                    @Override
+                    public String flush() {
+                        return getSummary(cache);
+                    }
+
+                    @Override
+                    protected void reset() {
+                        rule.reset();
+                    }
+
+                    @Override
+                    protected void add(@NotNull String line) {
+                        rule.add(line);
+                    }
+
+                    @NotNull
+                    @Override
+                    protected String getSummary(@NotNull String line) {
+                        return rule.getSummary(line);
+                    }
+                }
+                this.reorgWriter = new SumFiledsRule();
+                return this;
+            }
+
+            @Override
             public LayerOutRec reduce(RecordAccumulator accumulator) {
                 this.reorgWriter = accumulator;
                 return this;

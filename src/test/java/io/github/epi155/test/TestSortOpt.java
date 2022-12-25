@@ -2,6 +2,7 @@ package io.github.epi155.test;
 
 import io.github.epi155.pm.sort.RecordAccumulator;
 import io.github.epi155.pm.sort.SortEngine;
+import io.github.epi155.pm.sort.SumFields;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.junit.Assert;
@@ -306,5 +307,71 @@ public class TestSortOpt {
             "004003",
         };
         Assert.assertArrayEquals(e1, s1);
+    }
+    static class GroupCount2 extends SumFields {
+        int count;
+        private String keyOf(@NotNull String line) {
+            return line.substring(0,3);
+        }
+        @Override
+        protected void reset() {
+            count = 0;
+        }
+
+        @Override
+        protected void add(@NotNull String line) {
+            count++;
+        }
+
+        @NotNull
+        @Override
+        protected String getSummary(@NotNull String line) {
+            return keyOf(line)+String.format("%03d", count);
+        }
+    }
+    @Test
+    public void testNumSortMix4() throws IOException {
+        final File source = File.createTempFile("rand-", ".txt");
+        String[] as = {
+            "001001",
+            "001002",
+            "002003",
+            "003004",
+            "004005",
+            "004006",
+            "004007",
+        };
+        arrayToFile(as, source);
+        final File t1 = File.createTempFile("grp-", ".txt");
+        SortEngine.using(256)
+            .sortIn(source)
+            .sort(com)
+            .sum(new GroupCount2())
+            .sortOut(t1);
+        String[] s1 = arrayFromFile(t1);
+        String[] e1 = {
+            "001002",
+            "002001",
+            "003001",
+            "004003",
+        };
+        Assert.assertArrayEquals(e1, s1);
+
+        final File t2 = File.createTempFile("sfn-", ".txt");
+        SortEngine.using(256)
+            .sortIn(source)
+            .sort(com)
+            .sum(SumFields.none())
+            .sortOut(t2);
+        String[] s2 = arrayFromFile(t2);
+        final File t3 = File.createTempFile("lst-", ".txt");
+        SortEngine.using(256)
+            .sortIn(source)
+            .sort(com)
+            .first()
+            .sortOut(t3);
+        String[] s3 = arrayFromFile(t3);
+        Assert.assertArrayEquals(s2, s3);
+
     }
 }

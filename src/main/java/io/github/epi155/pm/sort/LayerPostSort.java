@@ -1,7 +1,7 @@
 package io.github.epi155.pm.sort;
 
 /**
- * Layer to set the ALLDUPS, NODUPS, FIRST, LAST, FIRSTDUP, LASTDUP, <i>REDUCE</i>
+ * Layer to set the ALLDUPS, NODUPS, FIRST, LAST, FIRSTDUP, LASTDUP, SUM, <i>REDUCE</i>
  * OUTREC options and define the output file
  */
 public interface LayerPostSort extends LayerOutRec {
@@ -66,6 +66,13 @@ public interface LayerPostSort extends LayerOutRec {
      * @return {@link LayerOutRec} instance
      */
     LayerOutRec lastDup();
+
+    /**
+     * This control statement maps each group of records with equal KEY-SORT in their summary
+     * @param rule  rule for accumulating records
+     * @return {@link LayerOutRec} instance
+     */
+    LayerOutRec sum(SumFields rule);
 
     /**
      * Performs a reduction on the elements of the records,
