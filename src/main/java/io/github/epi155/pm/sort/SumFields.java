@@ -58,7 +58,7 @@ public abstract class SumFields {
      * The options
      * <code>.sum(SumFields.none())</code>
      * and
-     * <code>.first()</code>
+     * <code>{@link LayerPostSort#first() .first()}</code>
      * have the same effect.
      * </p>
      *
