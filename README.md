@@ -7,9 +7,7 @@ The options are similar to the IBM DFSORT.
 The simplest way to invoke sort is
 
 ~~~java
-import java.io.File;
-
-class Main {
+public class Main {
     public static void main(String[] args) {
         File sourceFile = new File(args[0]);    // unsorted file
         File targetFile = new File(args[1]);    // sorted file
