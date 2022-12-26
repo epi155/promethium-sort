@@ -76,7 +76,12 @@ public interface LayerPostSort extends LayerOutRec {
 
     /**
      * Performs a reduction on the elements of the records,
-     * using some associative accumulation function,
+     * using an associative accumulation function.
+     *
+     * <p>
+     * This method is not part of the IBM DFSORT options,
+     * all other methods of this interface use a dedicated accumulation function of this method.
+     * </p>
      *
      * @param accumulator   custom accumulation function
      * @return {@link LayerOutRec} instance
