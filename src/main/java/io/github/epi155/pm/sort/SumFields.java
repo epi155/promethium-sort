@@ -62,6 +62,24 @@ public abstract class SumFields {
      * have the same effect.
      * </p>
      *
+     * <p>
+     *     The implementation is trivially:
+     * </p>
+     * <pre>
+     * = new SumFields() {
+     *     &#64;Override
+     *     protected void reset() { }   // none
+     *
+     *     &#64;Override
+     *     protected void add(String line) { } none
+     *
+     *     &#64;Override
+     *     protected String getSummary(String line) {
+     *         return line;
+     *     }
+     * };
+     * </pre>
+     *
      * @return {@link SumFields} instance for <i>none</i> rule
      */
     public static SumFields none() {
