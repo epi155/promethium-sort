@@ -4,7 +4,7 @@
 
     <groupId>io.github.epi155</groupId>
     <artifactId>promethium-sort</artifactId>
-    <version>0.5.2</version>
+    <version>0.5.2-SNAPSHOT</version>
 
     <!-- mvn versions:set -DnewVersion=x.y.z -->
     <!-- mvn versions:display-dependency-updates -->
