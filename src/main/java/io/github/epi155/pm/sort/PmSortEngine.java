@@ -374,9 +374,9 @@ class PmSortEngine implements LayerSortIn {
                 private final List<File> splitFiles = new LinkedList<>();
 
                 public boolean process(String line) {
-                    if (inRecFcn != null)
-                        line = inRecFcn.apply(line);
                     if (includeFilter == null || includeFilter.test(line)) {
+                        if (inRecFcn != null)
+                            line = inRecFcn.apply(line);
                         data.add(line);
                         if (data.size() >= maxNumRecord) {
                             File chunk = sortAndSave(data);
