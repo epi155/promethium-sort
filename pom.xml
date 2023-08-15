@@ -142,6 +142,28 @@
                                 <version>.+-(alpha|beta)(-\d+)?</version>
                             </ignoreVersion>
                         </ignoreVersions>
+                        <rules>
+                            <rule>
+                                <groupId>ch.qos.logback</groupId>
+                                <artifactId>logback-classic</artifactId>
+                                <ignoreVersion>
+                                    <type>regex</type>
+                                    <version>1[.][3-9]+.*</version>
+                                </ignoreVersion>
+                            </rule>
+                            <rule>
+                                <groupId>org.slf4j</groupId>
+                                <artifactId>slf4j-api</artifactId>
+                                <ignoreVersion>
+                                    <type>regex</type>
+                                    <version>[2-9]+.*</version>
+                                </ignoreVersion>
+                                <ignoreVersion>
+                                    <type>regex</type>
+                                    <version>.+-(alpha|beta)(-?\d+)?</version>
+                                </ignoreVersion>
+                            </rule>
+                        </rules>
                     </ruleSet>
                 </configuration>
             </plugin>
