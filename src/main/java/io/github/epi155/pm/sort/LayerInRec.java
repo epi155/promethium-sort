@@ -1,7 +1,5 @@
 package io.github.epi155.pm.sort;
 
-import org.jetbrains.annotations.NotNull;
-
 /**
  * Layer to set INREC option and define sorting
  */
@@ -12,5 +10,5 @@ public interface LayerInRec extends LayerSort {
      * @param inFcn edit function
      * @return {@link LayerSort} instance
      */
-    @NotNull LayerSort inRec(@NotNull RecordEditor inFcn);
+    LayerSort inRec(RecordEditor inFcn);
 }

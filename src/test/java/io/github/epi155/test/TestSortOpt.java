@@ -3,8 +3,6 @@ package io.github.epi155.test;
 import io.github.epi155.pm.sort.RecordAccumulator;
 import io.github.epi155.pm.sort.SortEngine;
 import io.github.epi155.pm.sort.SumFields;
-import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
 import org.junit.Assert;
 import org.junit.Test;
 
@@ -19,11 +17,11 @@ import java.util.Comparator;
 public class TestSortOpt {
     Comparator<String> com = new Comparator<String>() {
         @Override
-        public int compare(@NotNull String o1, @NotNull String o2) {
+        public int compare(String o1, String o2) {
             return o1.substring(0, 3).compareTo(o2.substring(0, 3));
         }
     };
-    private static String[] arrayFromFile(@NotNull File t1) {
+    private static String[] arrayFromFile(File t1) {
         String[] s1 = new String[0];
         try {
 
@@ -252,12 +250,11 @@ public class TestSortOpt {
     static class GroupCount implements RecordAccumulator {
         int count = 0;
         private String cacheKey = null;
-        private String keyOf(@NotNull String line) {
+        private String keyOf(String line) {
             return line.substring(0,3);
         }
-        @Nullable
         @Override
-        public String reduce(@NotNull String line) {
+        public String reduce(String line) {
             String out;
             String key = keyOf(line);
             if (cacheKey == null) {
@@ -274,7 +271,6 @@ public class TestSortOpt {
             return out;
         }
 
-        @Nullable
         @Override
         public String flush() {
             return cacheKey+String.format("%03d", count);
@@ -310,7 +306,7 @@ public class TestSortOpt {
     }
     static class GroupCount2 extends SumFields {
         int count;
-        private String keyOf(@NotNull String line) {
+        private String keyOf(String line) {
             return line.substring(0,3);
         }
         @Override
@@ -319,13 +315,12 @@ public class TestSortOpt {
         }
 
         @Override
-        protected void add(@NotNull String line) {
+        protected void add(String line) {
             count++;
         }
 
-        @NotNull
         @Override
-        protected String getSummary(@NotNull String line) {
+        protected String getSummary(String line) {
             return keyOf(line)+String.format("%03d", count);
         }
     }

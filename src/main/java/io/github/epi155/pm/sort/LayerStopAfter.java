@@ -1,7 +1,5 @@
 package io.github.epi155.pm.sort;
 
-import org.jetbrains.annotations.NotNull;
-
 /**
  * Layer to set STOPAFT, INREC options and define sorting
  */
@@ -14,5 +12,5 @@ public interface LayerStopAfter extends LayerInRec {
      * @param nmStop maximum number of records
      * @return {@link LayerInRec} instance
      */
-    @NotNull LayerInRec stopAfter(int nmStop);
+    LayerInRec stopAfter(int nmStop);
 }

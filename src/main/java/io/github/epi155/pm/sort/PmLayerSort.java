@@ -1,7 +1,5 @@
 package io.github.epi155.pm.sort;
 
-import org.jetbrains.annotations.NotNull;
-
 import java.util.Comparator;
 
 abstract class PmLayerSort implements LayerSort {
@@ -11,8 +9,6 @@ abstract class PmLayerSort implements LayerSort {
             return o1.compareTo(o2);
         }
     };
-
-    @NotNull
     public LayerPostSort sort() {
         return sort(naturalOrder);
     }

@@ -1,7 +1,5 @@
 package io.github.epi155.pm.sort;
 
-import org.jetbrains.annotations.NotNull;
-
 /**
  * Provides rules for summing records
  * <br>
@@ -24,7 +22,7 @@ import org.jetbrains.annotations.NotNull;
  *     }
  *
  *     &#64;Override
- *     protected String getSummary(@NotNull String line) {
+ *     protected String getSummary(String line) {
  *         return keyOf(line)+String.format("%03d", count);
  *     }
  * }
@@ -39,13 +37,12 @@ public abstract class SumFields {
             }
 
             @Override
-            protected void add(@NotNull String line) {
+            protected void add(String line) {
                 // dummy method
             }
 
-            @NotNull
             @Override
-            protected String getSummary(@NotNull String line) {
+            protected String getSummary(String line) {
                 return line;
             }
         };
@@ -95,12 +92,12 @@ public abstract class SumFields {
      * adds the supplied record to the accumulator function
      * @param line current record
      */
-    protected abstract void add(@NotNull String line);
+    protected abstract void add(String line);
 
     /**
      * Provides the summary (sum) of the accumulated records
      * @param line first record of the group with the same KEY-SORT
      * @return summary of the accumulated records
      */
-    protected abstract @NotNull String getSummary(@NotNull String line);
+    protected abstract String getSummary(String line);
 }

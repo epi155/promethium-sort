@@ -1,8 +1,5 @@
 package io.github.epi155.pm.sort;
 
-import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
-
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.File;
@@ -37,7 +34,7 @@ class PmSortEngine implements LayerSortIn {
     }
 
     @Override
-    public @NotNull LayerSkipRecord sortIn(@NotNull File unsortedFile) {
+    public LayerSkipRecord sortIn(File unsortedFile) {
         return this.new PmSortIn(unsortedFile);
     }
 
@@ -53,30 +50,30 @@ class PmSortEngine implements LayerSortIn {
         }
 
         @Override
-        public @NotNull LayerSort inRec(@NotNull RecordEditor inFcn) {
+        public LayerSort inRec(RecordEditor inFcn) {
             this.inRecFcn = inFcn;
             return this;
         }
 
         @Override
-        public @NotNull LayerStopAfter include(@NotNull SortFilter test) {
+        public LayerStopAfter include(SortFilter test) {
             this.includeFilter = test;
             return this;
         }
 
         @Override
-        public @NotNull LayerInclude skipRecord(int nmSkip) {
+        public LayerInclude skipRecord(int nmSkip) {
             this.nmSkip = nmSkip;
             return this;
         }
 
         @Override
-        public @NotNull LayerPostSort sort(@NotNull Comparator<String> comparator) {
+        public LayerPostSort sort(Comparator<String> comparator) {
             return this.new PmSort(comparator);
         }
 
         @Override
-        public @NotNull LayerInRec stopAfter(int nmStop) {
+        public LayerInRec stopAfter(int nmStop) {
             this.nmStop = nmStop;
             return this;
         }
@@ -92,13 +89,13 @@ class PmSortEngine implements LayerSortIn {
             }
 
             @Override
-            public @NotNull LayerSortOut outRec(@NotNull RecordEditor outFcn) {
+            public LayerSortOut outRec( RecordEditor outFcn) {
                 this.outRecFcn = outFcn;
                 return this;
             }
 
             @Override
-            public void sortOut(@NotNull File sortedFile) {
+            public void sortOut(File sortedFile) {
                 this.target = sortedFile;
                 List<File> tempFiles = split();
                 if (tempFiles.size() > 1) {
@@ -115,7 +112,7 @@ class PmSortEngine implements LayerSortIn {
                 }
             }
 
-            private void merge(ExecutorService mergerPool, @NotNull List<File> tempFiles) {
+            private void merge(ExecutorService mergerPool, List<File> tempFiles) {
                 List<File> mergeFiles = new ArrayList<>();
                 Phaser phaser = new Phaser();
                 if (tempFiles.size() == 2) {
@@ -209,9 +206,8 @@ class PmSortEngine implements LayerSortIn {
                 class SumFiledsRule extends SumFields implements RecordAccumulator {
                     private String cache = null;
 
-                    @Nullable
                     @Override
-                    public String reduce(@NotNull String line) {
+                    public String reduce(String line) {
                         String out;
                         if (cache == null ) {
                             out = null;
@@ -228,7 +224,6 @@ class PmSortEngine implements LayerSortIn {
                         return out;
                     }
 
-                    @Nullable
                     @Override
                     public String flush() {
                         return getSummary(cache);
@@ -240,13 +235,12 @@ class PmSortEngine implements LayerSortIn {
                     }
 
                     @Override
-                    protected void add(@NotNull String line) {
+                    protected void add(String line) {
                         rule.add(line);
                     }
 
-                    @NotNull
                     @Override
-                    protected String getSummary(@NotNull String line) {
+                    protected String getSummary(String line) {
                         return rule.getSummary(line);
                     }
                 }
@@ -331,11 +325,11 @@ class PmSortEngine implements LayerSortIn {
                     }
                 }
 
-                protected void flush(@NotNull BufferedWriter wrt) throws IOException {
+                protected void flush(BufferedWriter wrt) throws IOException {
                     // could be overwritten
                 }
 
-                protected void writeLn(@NotNull BufferedWriter wrt, String line) throws IOException {
+                protected void writeLn(BufferedWriter wrt, String line) throws IOException {
                     wrt.write(line);
                     wrt.newLine();
                 }
@@ -347,7 +341,7 @@ class PmSortEngine implements LayerSortIn {
                 }
 
                 @Override
-                protected void writeLn(@NotNull BufferedWriter wrt, String line) throws IOException {
+                protected void writeLn(BufferedWriter wrt, String line) throws IOException {
                     String stuff = reorgWriter ==null ? line : reorgWriter.reduce(line);
                     if (stuff != null) {
                         if (outRecFcn != null)
@@ -357,7 +351,7 @@ class PmSortEngine implements LayerSortIn {
                 }
 
                 @Override
-                protected void flush(@NotNull BufferedWriter wrt) throws IOException {
+                protected void flush(BufferedWriter wrt) throws IOException {
                     if (reorgWriter != null) {
                         String stuff = reorgWriter.flush();
                         if (stuff != null) {
@@ -389,7 +383,7 @@ class PmSortEngine implements LayerSortIn {
                     }
                 }
 
-                private void save(@NotNull List<String> data, File file) {
+                private void save(List<String> data, File file) {
                     try (BufferedWriter bw = Files.newBufferedWriter(file.toPath(), charset)) {
                         for (String datum : data) {
                             bw.write(datum);
@@ -400,7 +394,7 @@ class PmSortEngine implements LayerSortIn {
                     }
                 }
 
-                private File sortAndSave(@NotNull List<String> data) {
+                private File sortAndSave(List<String> data) {
                     Collections.sort(data, comparator);
                     File file;
                     try {
@@ -413,7 +407,7 @@ class PmSortEngine implements LayerSortIn {
                     return file;
                 }
 
-                private void sortAndFinalSave(@NotNull List<String> data, File file) {
+                private void sortAndFinalSave(List<String> data, File file) {
                     Collections.sort(data, comparator);
                     if (reorgWriter != null) {
                         data = reorg(data);
@@ -463,9 +457,8 @@ class PmSortEngine implements LayerSortIn {
 
             private class FirstReorgWriter implements RecordAccumulator {
                 private String cache = null;
-                @Nullable
                 @Override
-                public String reduce(@NotNull String line) {
+                public String reduce(String line) {
                     if (cache == null || comparator.compare(cache, line) != 0) {
                         cache = line;
                         return line;
@@ -474,7 +467,6 @@ class PmSortEngine implements LayerSortIn {
                     }
                 }
 
-                @Nullable
                 @Override
                 public String flush() {
                     return null;
@@ -484,9 +476,8 @@ class PmSortEngine implements LayerSortIn {
             private class AllDupsReorgWriter implements RecordAccumulator {
                 private String cache = null;
                 private boolean pendingWrite;
-                @Nullable
                 @Override
-                public String reduce(@NotNull String line) {
+                public String reduce(String line) {
                     if (cache == null) {
                         cache = line;
                         pendingWrite = false;
@@ -504,7 +495,6 @@ class PmSortEngine implements LayerSortIn {
                     }
                 }
 
-                @Nullable
                 @Override
                 public String flush() {
                     if (pendingWrite) {
@@ -519,9 +509,8 @@ class PmSortEngine implements LayerSortIn {
             private class NoDupsReorgWriter implements RecordAccumulator {
                 private String cache = null;
                 private boolean pendingWrite;
-                @Nullable
                 @Override
-                public String reduce(@NotNull String line) {
+                public String reduce(String line) {
                     if (cache == null) {
                         cache = line;
                         pendingWrite = true;
@@ -537,7 +526,6 @@ class PmSortEngine implements LayerSortIn {
                     }
                 }
 
-                @Nullable
                 @Override
                 public String flush() {
                     if (pendingWrite) {
@@ -551,9 +539,8 @@ class PmSortEngine implements LayerSortIn {
 
             private class LastReorgWriter implements RecordAccumulator {
                 private String cache = null;
-                @Nullable
                 @Override
-                public String reduce(@NotNull String line) {
+                public String reduce(String line) {
                     String out;
                     if (cache == null || comparator.compare(cache, line) == 0) {
                         out = null;
@@ -564,7 +551,6 @@ class PmSortEngine implements LayerSortIn {
                     return out;
                 }
 
-                @Nullable
                 @Override
                 public String flush() {
                     return cache;
@@ -574,9 +560,8 @@ class PmSortEngine implements LayerSortIn {
             private class FirstDupReorgWriter implements RecordAccumulator {
                 private String cache = null;
                 private boolean isGarbage;
-                @Nullable
                 @Override
-                public String reduce(@NotNull String line) {
+                public String reduce(String line) {
                     String out;
                     if (cache == null || comparator.compare(cache, line) != 0) {
                         isGarbage = false;
@@ -591,7 +576,6 @@ class PmSortEngine implements LayerSortIn {
                     return out;
                 }
 
-                @Nullable
                 @Override
                 public String flush() {
                     return null;
@@ -601,9 +585,8 @@ class PmSortEngine implements LayerSortIn {
             private class LastDupReorgWriter implements RecordAccumulator {
                 private String cache = null;
                 private boolean isGarbage;
-                @Nullable
                 @Override
-                public String reduce(@NotNull String line) {
+                public String reduce(String line) {
                     String out;
                     if (cache == null) {
                         isGarbage = true;
@@ -621,7 +604,6 @@ class PmSortEngine implements LayerSortIn {
                     return out;
                 }
 
-                @Nullable
                 @Override
                 public String flush() {
                     return isGarbage ? null : cache;

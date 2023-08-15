@@ -1,7 +1,5 @@
 package io.github.epi155.pm.sort;
 
-import org.jetbrains.annotations.NotNull;
-
 import java.io.File;
 
 /**
@@ -14,5 +12,5 @@ public interface LayerSortIn {
      * @param unsortedFile file to be sorted
      * @return {@link LayerSkipRecord} instance
      */
-    @NotNull LayerSkipRecord sortIn(@NotNull File unsortedFile);
+    LayerSkipRecord sortIn(File unsortedFile);
 }

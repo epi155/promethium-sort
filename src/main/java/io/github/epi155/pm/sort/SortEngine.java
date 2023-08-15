@@ -1,7 +1,5 @@
 package io.github.epi155.pm.sort;
 
-import org.jetbrains.annotations.NotNull;
-
 import java.io.File;
 import java.nio.charset.Charset;
 import java.util.Comparator;
@@ -61,7 +59,7 @@ public class SortEngine {
      * @param maxThread    max thread for merge split file
      * @return {@link LayerSortIn} instance
      */
-    public static @NotNull LayerSortIn using(int maxNumRecord, @NotNull Charset charset, int maxThread) {
+    public static LayerSortIn using(int maxNumRecord, Charset charset, int maxThread) {
         return new PmSortEngine(maxNumRecord, charset, maxThread);
     }
 
@@ -72,7 +70,7 @@ public class SortEngine {
      * @param charset      file charset
      * @return {@link LayerSortIn} instance
      */
-    public static @NotNull LayerSortIn using(int maxNumRecord, @NotNull Charset charset) {
+    public static LayerSortIn using(int maxNumRecord, Charset charset) {
         return new PmSortEngine(maxNumRecord, charset);
     }
 
@@ -82,7 +80,7 @@ public class SortEngine {
      * @param maxNumRecord max record sorted in memory
      * @return {@link LayerSortIn} instance
      */
-    public static @NotNull LayerSortIn using(int maxNumRecord) {
+    public static LayerSortIn using(int maxNumRecord) {
         return new PmSortEngine(maxNumRecord);
     }
 }

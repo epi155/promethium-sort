@@ -1,8 +1,5 @@
 package io.github.epi155.pm.sort;
 
-import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
-
 /**
  * Aggregate (and edit) record
  * <br>
@@ -50,14 +47,12 @@ public interface RecordAccumulator {
      * @param line  original record
      * @return      original, or edited, record, or null
      */
-    @Nullable
-    String reduce(@NotNull String line);
+    String reduce(String line);
 
     /**
      * returns any value left in the accumulation cache or null.
      *
      * @return      original, or edited, record, or null
      */
-    @Nullable
     String flush();
 }

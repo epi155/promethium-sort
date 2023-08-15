@@ -1,7 +1,5 @@
 package io.github.epi155.pm.sort;
 
-import org.jetbrains.annotations.NotNull;
-
 import java.io.File;
 
 /**
@@ -13,5 +11,5 @@ public interface LayerSortOut {
      *
      * @param sortedFile sorted file
      */
-    void sortOut(@NotNull File sortedFile);
+    void sortOut(File sortedFile);
 }
