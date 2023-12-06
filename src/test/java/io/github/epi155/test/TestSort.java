@@ -4,8 +4,8 @@ import io.github.epi155.pm.sort.RecordEditor;
 import io.github.epi155.pm.sort.SortEngine;
 import io.github.epi155.pm.sort.SortException;
 import io.github.epi155.pm.sort.SortFilter;
-import org.junit.Assert;
-import org.junit.Test;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
 
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
@@ -33,12 +33,7 @@ public class TestSort {
         }
         final File target = File.createTempFile("sort-", ".txt");
         SortEngine.using(256)
-            .sortIn(source).sort(new Comparator<String>() {
-                @Override
-                public int compare(String o1, String o2) {
-                    return o1.compareTo(o2);
-                }
-            }).sortOut(target);
+            .sortIn(source).sort(Comparator.naturalOrder()).sortOut(target);
         verifyOrder(target);
     }
 
@@ -48,7 +43,7 @@ public class TestSort {
             String line;
             while ((line = br.readLine()) != null) {
                 if (oldLine != null) {
-                    Assert.assertTrue("error: \n"+oldLine+"\n"+line, oldLine.compareTo(line) <= 0);
+                    Assertions.assertTrue(oldLine.compareTo(line) <= 0, "error: \n"+oldLine+"\n"+line);
                 }
                 oldLine = line;
             }
@@ -67,24 +62,9 @@ public class TestSort {
             bw.newLine();
         }
         final File target = File.createTempFile("aft-", ".txt");
-        final RecordEditor editIn = new RecordEditor() {
-            @Override
-            public String apply(String line) {
-                return line.substring(1);
-            }
-        };
-        final RecordEditor editOut = new RecordEditor() {
-            @Override
-            public String apply(String line) {
-                return line + "A";
-            }
-        };
-        final SortFilter filter = new SortFilter() {
-            @Override
-            public boolean test(String line) {
-                return (((int) line.charAt(line.length() - 1)) & 0x01) == 0;
-            }
-        };
+        final RecordEditor editIn = line -> line.substring(1);
+        final RecordEditor editOut = line -> line + "A";
+        final SortFilter filter = line -> (((int) line.charAt(line.length() - 1)) & 0x01) == 0;
         SortEngine.using(12, StandardCharsets.US_ASCII)
             .sortIn(source)
             .skipRecord(100)
@@ -131,16 +111,11 @@ public class TestSort {
         final File target = File.createTempFile("00-", ".txt");
         SortEngine.using(256, StandardCharsets.US_ASCII, 2)
             .sortIn(source)
-            .sort(new Comparator<String>() {
-                @Override
-                public int compare(String o1, String o2) {
-                    return o1.substring(5).compareTo(o2.substring(5));
-                }
-            })
+            .sort(Comparator.comparing(o -> o.substring(5)))
             .sortOut(target);
         verifyOrder(target);
     }
-    @Test(expected = SortException.class)
+    @Test
     public void testNum3() throws IOException {
         final File source = File.createTempFile("bef-", ".txt");
         try (BufferedWriter bw = Files.newBufferedWriter(Paths.get(source.getAbsolutePath()), StandardCharsets.US_ASCII)) {
@@ -150,16 +125,12 @@ public class TestSort {
             }
         }
         final File target = new File("/dev/full");
-        SortEngine.using(256, StandardCharsets.US_ASCII, 2)
-            .sortIn(source)
-            .sort(new Comparator<String>() {
-                @Override
-                public int compare(String o1, String o2) {
-                    return o1.substring(5).compareTo(o2.substring(5));
-                }
-            })
-            .sortOut(target);
-        verifyOrder(target);
+        Assertions.assertThrows(SortException.class, () -> SortEngine
+                .using(256, StandardCharsets.US_ASCII, 2)
+                .sortIn(source)
+                .sort(Comparator.comparing(o -> o.substring(5)))
+                .sortOut(target));
+       // verifyOrder(target);
     }
     @Test
     public void testNum4() throws IOException {
@@ -171,12 +142,7 @@ public class TestSort {
             }
         }
         final File target = File.createTempFile("00-", ".txt");
-        Comparator<String> comp = new Comparator<String>() {
-            @Override
-            public int compare(String o1, String o2) {
-                return o1.substring(0,5).compareTo(o2.substring(0,5));
-            }
-        };
+        Comparator<String> comp = Comparator.comparing(o -> o.substring(0, 5));
         SortEngine.using(20, StandardCharsets.US_ASCII, 2)
             .sortIn(source)
             .sort(comp)
@@ -193,12 +159,7 @@ public class TestSort {
             }
         }
         final File target = File.createTempFile("00-", ".txt");
-        Comparator<String> comp = new Comparator<String>() {
-            @Override
-            public int compare(String o1, String o2) {
-                return o2.compareTo(o1);
-            }
-        };
+        Comparator<String> comp = Comparator.reverseOrder();
         SortEngine.using(20, StandardCharsets.US_ASCII, 2)
             .sortIn(source)
             .sort(comp)
@@ -212,7 +173,7 @@ public class TestSort {
             String line;
             while ((line = br.readLine()) != null) {
                 if (oldLine != null) {
-                    Assert.assertTrue("error: \n"+oldLine+"\n"+line, oldLine.compareTo(line) >= 0);
+                    Assertions.assertTrue(oldLine.compareTo(line) >= 0, "error: \n"+oldLine+"\n"+line);
                 }
                 oldLine = line;
             }
@@ -233,13 +194,10 @@ public class TestSort {
         final File target = File.createTempFile("sort-", ".txt");
         SortEngine.using(2048)
             .sortIn(source)
-            .sort(new Comparator<String>() {
-                @Override
-                public int compare(String o1, String o2) {
-                    String s1 = o1.substring(0,10);
-                    String s2 = o2.substring(0,10);
-                    return s1.compareTo(s2);
-                }
+            .sort((o1, o2) -> {
+                String s1 = o1.substring(0,10);
+                String s2 = o2.substring(0,10);
+                return s1.compareTo(s2);
             })
             .allDups()
             .sortOut(target);
@@ -342,12 +300,7 @@ public class TestSort {
             .sortIn(source)
             .sort()
             .lastDup()
-            .outRec(new RecordEditor() {
-                @Override
-                public String apply(String line) {
-                    return "0"+line;
-                }
-            })
+            .outRec(line -> "0"+line)
             .sortOut(target);
         verifyOrder(target);
     }

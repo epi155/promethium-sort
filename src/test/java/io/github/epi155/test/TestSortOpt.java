@@ -3,8 +3,8 @@ package io.github.epi155.test;
 import io.github.epi155.pm.sort.RecordAccumulator;
 import io.github.epi155.pm.sort.SortEngine;
 import io.github.epi155.pm.sort.SumFields;
-import org.junit.Assert;
-import org.junit.Test;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
 
 import java.io.BufferedWriter;
 import java.io.File;
@@ -15,12 +15,7 @@ import java.nio.file.Paths;
 import java.util.Comparator;
 
 public class TestSortOpt {
-    Comparator<String> com = new Comparator<String>() {
-        @Override
-        public int compare(String o1, String o2) {
-            return o1.substring(0, 3).compareTo(o2.substring(0, 3));
-        }
-    };
+    Comparator<String> com = Comparator.comparing(o -> o.substring(0, 3));
     private static String[] arrayFromFile(File t1) {
         String[] s1 = new String[0];
         try {
@@ -65,7 +60,7 @@ public class TestSortOpt {
             "001001",
             "004005",
         };
-        Assert.assertArrayEquals(e1, s1);
+        Assertions.assertArrayEquals(e1, s1);
 
         final File t2 = File.createTempFile("ld-", ".txt");
         SortEngine.using(256)
@@ -78,7 +73,7 @@ public class TestSortOpt {
             "001002",
             "004007",
         };
-        Assert.assertArrayEquals(e2, s2);
+        Assertions.assertArrayEquals(e2, s2);
 
         final File t3 = File.createTempFile("fx-", ".txt");
         SortEngine.using(256)
@@ -93,7 +88,7 @@ public class TestSortOpt {
             "003004",
             "004005",
         };
-        Assert.assertArrayEquals(e3, s3);
+        Assertions.assertArrayEquals(e3, s3);
 
         final File t4 = File.createTempFile("lx-", ".txt");
         SortEngine.using(256)
@@ -108,7 +103,7 @@ public class TestSortOpt {
             "003004",
             "004007",
         };
-        Assert.assertArrayEquals(e4, s4);
+        Assertions.assertArrayEquals(e4, s4);
 
         final File t5 = File.createTempFile("ad-", ".txt");
         SortEngine.using(256)
@@ -124,7 +119,7 @@ public class TestSortOpt {
             "004006",
             "004007",
         };
-        Assert.assertArrayEquals(e5, s5);
+        Assertions.assertArrayEquals(e5, s5);
 
         final File t6 = File.createTempFile("nd-", ".txt");
         SortEngine.using(256)
@@ -137,7 +132,7 @@ public class TestSortOpt {
             "002003",
             "003004",
         };
-        Assert.assertArrayEquals(e6, s6);
+        Assertions.assertArrayEquals(e6, s6);
     }
 
     @Test
@@ -166,7 +161,7 @@ public class TestSortOpt {
             "001001",
             "004005",
         };
-        Assert.assertArrayEquals(e1, s1);
+        Assertions.assertArrayEquals(e1, s1);
 
         final File t2 = File.createTempFile("ld-", ".txt");
         SortEngine.using(256)
@@ -179,7 +174,7 @@ public class TestSortOpt {
             "001002",
             "004007",
         };
-        Assert.assertArrayEquals(e2, s2);
+        Assertions.assertArrayEquals(e2, s2);
 
         final File t3 = File.createTempFile("fx-", ".txt");
         SortEngine.using(256)
@@ -196,7 +191,7 @@ public class TestSortOpt {
             "004005",
             "005008",
         };
-        Assert.assertArrayEquals(e3, s3);
+        Assertions.assertArrayEquals(e3, s3);
 
         final File t4 = File.createTempFile("lx-", ".txt");
         SortEngine.using(256)
@@ -213,7 +208,7 @@ public class TestSortOpt {
             "004007",
             "005008",
         };
-        Assert.assertArrayEquals(e4, s4);
+        Assertions.assertArrayEquals(e4, s4);
 
         final File t5 = File.createTempFile("ad-", ".txt");
         SortEngine.using(256)
@@ -229,7 +224,7 @@ public class TestSortOpt {
             "004006",
             "004007",
         };
-        Assert.assertArrayEquals(e5, s5);
+        Assertions.assertArrayEquals(e5, s5);
 
         final File t6 = File.createTempFile("nd-", ".txt");
         SortEngine.using(256)
@@ -244,7 +239,7 @@ public class TestSortOpt {
             "003004",
             "005008",
         };
-        Assert.assertArrayEquals(e6, s6);
+        Assertions.assertArrayEquals(e6, s6);
     }
 
     static class GroupCount implements RecordAccumulator {
@@ -302,7 +297,7 @@ public class TestSortOpt {
             "003001",
             "004003",
         };
-        Assert.assertArrayEquals(e1, s1);
+        Assertions.assertArrayEquals(e1, s1);
     }
     static class GroupCount2 extends SumFields {
         int count;
@@ -350,7 +345,7 @@ public class TestSortOpt {
             "003001",
             "004003",
         };
-        Assert.assertArrayEquals(e1, s1);
+        Assertions.assertArrayEquals(e1, s1);
 
         final File t2 = File.createTempFile("sfn-", ".txt");
         SortEngine.using(256)
@@ -366,7 +361,7 @@ public class TestSortOpt {
             .first()
             .sortOut(t3);
         String[] s3 = arrayFromFile(t3);
-        Assert.assertArrayEquals(s2, s3);
+        Assertions.assertArrayEquals(s2, s3);
 
     }
 }
