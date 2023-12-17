@@ -13,24 +13,19 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.Phaser;
 
 class PmSortEngine implements LayerSortIn {
-    private static final String PRFX = "sort-";
-    private static final String SUFX = ".tmp";
+    private static final String PREFIX = "sort-";
+    private static final String SUFFIX = ".tmp";
+    private static final int DEFAULT_MAX = 2048;
+    private final File swap;
     private final int maxNumRecord;
     private final Charset charset;
     private final int maxThread;
 
-    public PmSortEngine(int maxNumRecord, Charset charset, int maxThread) {
-        this.maxNumRecord = maxNumRecord;
-        this.charset = charset;
-        this.maxThread = maxThread;
-    }
-
-    public PmSortEngine(int maxNumRecord, Charset charset) {
-        this(maxNumRecord, charset, Math.max(1, Runtime.getRuntime().availableProcessors() / 2));
-    }
-
-    public PmSortEngine(int maxNumRecord) {
-        this(maxNumRecord, StandardCharsets.UTF_8);
+    public PmSortEngine(int maxNumRecord, Charset charset, int maxThread, File tempDirectory) {
+        this.maxNumRecord = maxNumRecord>0 ? maxNumRecord : DEFAULT_MAX;
+        this.charset = charset!=null ? charset : StandardCharsets.UTF_8;
+        this.maxThread = maxThread>0 ? maxThread : Math.max(1, Runtime.getRuntime().availableProcessors() / 2);
+        this.swap = tempDirectory;  // Nullable
     }
 
     @Override
@@ -127,7 +122,7 @@ class PmSortEngine implements LayerSortIn {
                             mergeFiles.add(sx);
                         } else {
                             try {
-                                File cx = File.createTempFile(PRFX, SUFX);
+                                File cx = File.createTempFile(PREFIX, SUFFIX, swap);
                                 cx.deleteOnExit();
                                 mergeFiles.add(cx);
                                 MergeTask mergeTask = this.new MergeTask(sx, dx, cx, phaser);
@@ -398,7 +393,7 @@ class PmSortEngine implements LayerSortIn {
                     Collections.sort(data, comparator);
                     File file;
                     try {
-                        file = File.createTempFile(PRFX, SUFX);
+                        file = File.createTempFile(PREFIX, SUFFIX, swap);
                         file.deleteOnExit();
                         save(data, file);
                     } catch (IOException e) {

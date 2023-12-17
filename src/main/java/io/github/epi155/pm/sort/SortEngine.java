@@ -1,7 +1,6 @@
 package io.github.epi155.pm.sort;
 
 import java.io.File;
-import java.nio.charset.Charset;
 import java.util.Comparator;
 
 /**
@@ -87,35 +86,21 @@ public class SortEngine {
     }
 
     /**
-     * Set the sort context
-     *
-     * @param maxNumRecord max record sorted in memory
-     * @param charset      file charset
-     * @param maxThread    max thread for merge split file
-     * @return {@link LayerSortIn} instance
+     * Sort builder creator
+     * @return instance of {@link SortBuilderRecord}
      */
-    public static LayerSortIn using(int maxNumRecord, Charset charset, int maxThread) {
-        return new PmSortEngine(maxNumRecord, charset, maxThread);
+    public static SortBuilderRecord builder() {
+        return new PmSortBuilder();
     }
 
     /**
-     * Set the sort context (maxThread = nmCore / 2)
-     *
-     * @param maxNumRecord max record sorted in memory
-     * @param charset      file charset
-     * @return {@link LayerSortIn} instance
-     */
-    public static LayerSortIn using(int maxNumRecord, Charset charset) {
-        return new PmSortEngine(maxNumRecord, charset);
-    }
-
-    /**
-     * Set the sort context (charset = UTF-8; maxThread = nmCore / 2)
+     * Set the sort context (charset = UTF-8; maxThread = nmCore / 2, temp = ${java.io.tmpdir})
      *
      * @param maxNumRecord max record sorted in memory
      * @return {@link LayerSortIn} instance
      */
     public static LayerSortIn using(int maxNumRecord) {
-        return new PmSortEngine(maxNumRecord);
+        return new PmSortEngine(maxNumRecord, null, 0,  null);
     }
+
 }

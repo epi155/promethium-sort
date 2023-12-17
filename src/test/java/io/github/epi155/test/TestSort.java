@@ -32,7 +32,9 @@ public class TestSort {
             bw.newLine();
         }
         final File target = File.createTempFile("sort-", ".txt");
-        SortEngine.using(256)
+        SortEngine.builder()
+                .withMaxRecord(256)
+                .build()
             .sortIn(source).sort(Comparator.naturalOrder()).sortOut(target);
         verifyOrder(target);
     }
@@ -65,7 +67,9 @@ public class TestSort {
         final RecordEditor editIn = line -> line.substring(1);
         final RecordEditor editOut = line -> line + "A";
         final SortFilter filter = line -> (((int) line.charAt(line.length() - 1)) & 0x01) == 0;
-        SortEngine.using(12, StandardCharsets.US_ASCII)
+        SortEngine.builder()
+                .withMaxRecord(12).withCharset(StandardCharsets.US_ASCII)
+                .build()
             .sortIn(source)
             .skipRecord(100)
             .include(filter)
@@ -76,7 +80,9 @@ public class TestSort {
             .sortOut(target);
         verifyOrder(target);
 
-        SortEngine.using(12, StandardCharsets.US_ASCII)
+        SortEngine.builder()
+                .withMaxRecord(12).withCharset(StandardCharsets.US_ASCII)
+                .build()
             .sortIn(source)
             .skipRecord(5)
             .include(filter)
@@ -87,7 +93,9 @@ public class TestSort {
             .sortOut(target);
         verifyOrder(target);
 
-        SortEngine.using(100, StandardCharsets.US_ASCII)
+        SortEngine.builder()
+                .withMaxRecord(100).withCharset(StandardCharsets.US_ASCII)
+                .build()
             .sortIn(source)
             .skipRecord(5)
             .include(filter)
@@ -109,7 +117,11 @@ public class TestSort {
             }
         }
         final File target = File.createTempFile("00-", ".txt");
-        SortEngine.using(256, StandardCharsets.US_ASCII, 2)
+        SortEngine.builder()
+                .withMaxRecord(256)
+                .withCharset(StandardCharsets.US_ASCII)
+                .withMaxThread(2)
+                .build()
             .sortIn(source)
             .sort(Comparator.comparing(o -> o.substring(5)))
             .sortOut(target);
@@ -125,8 +137,11 @@ public class TestSort {
             }
         }
         final File target = new File("/dev/full");
-        Assertions.assertThrows(SortException.class, () -> SortEngine
-                .using(256, StandardCharsets.US_ASCII, 2)
+        Assertions.assertThrows(SortException.class, () -> SortEngine.builder()
+                .withMaxRecord(256)
+                .withCharset(StandardCharsets.US_ASCII)
+                .withMaxThread(2)
+                .build()
                 .sortIn(source)
                 .sort(Comparator.comparing(o -> o.substring(5)))
                 .sortOut(target));
@@ -143,7 +158,11 @@ public class TestSort {
         }
         final File target = File.createTempFile("00-", ".txt");
         Comparator<String> comp = Comparator.comparing(o -> o.substring(0, 5));
-        SortEngine.using(20, StandardCharsets.US_ASCII, 2)
+        SortEngine.builder()
+                .withMaxRecord(20)
+                .withCharset(StandardCharsets.US_ASCII)
+                .withMaxThread(2)
+                .build()
             .sortIn(source)
             .sort(comp)
             .sortOut(target);
@@ -160,7 +179,11 @@ public class TestSort {
         }
         final File target = File.createTempFile("00-", ".txt");
         Comparator<String> comp = Comparator.reverseOrder();
-        SortEngine.using(20, StandardCharsets.US_ASCII, 2)
+        SortEngine.builder()
+                .withMaxRecord(20)
+                .withCharset(StandardCharsets.US_ASCII)
+                .withMaxThread(2)
+                .build()
             .sortIn(source)
             .sort(comp)
             .sortOut(target);
@@ -192,7 +215,9 @@ public class TestSort {
             }
         }
         final File target = File.createTempFile("sort-", ".txt");
-        SortEngine.using(2048)
+        SortEngine.builder()
+                .withMaxRecord(2048)
+                .build()
             .sortIn(source)
             .sort((o1, o2) -> {
                 String s1 = o1.substring(0,10);
@@ -216,7 +241,9 @@ public class TestSort {
             bw.newLine();
         }
         final File target = File.createTempFile("sort-", ".txt");
-        SortEngine.using(256)
+        SortEngine.builder()
+                .withMaxRecord(256)
+                .build()
             .sortIn(source)
             .sort()
             .noDups()
@@ -236,7 +263,9 @@ public class TestSort {
             bw.newLine();
         }
         final File target = File.createTempFile("sort-", ".txt");
-        SortEngine.using(256)
+        SortEngine.builder()
+                .withMaxRecord(256)
+                .build()
             .sortIn(source)
             .sort()
             .first()
@@ -256,7 +285,9 @@ public class TestSort {
             bw.newLine();
         }
         final File target = File.createTempFile("sort-", ".txt");
-        SortEngine.using(256)
+        SortEngine.builder()
+                .withMaxRecord(256)
+                .build()
             .sortIn(source)
             .sort()
             .last()
@@ -276,7 +307,9 @@ public class TestSort {
             bw.newLine();
         }
         final File target = File.createTempFile("sort-", ".txt");
-        SortEngine.using(256)
+        SortEngine.builder()
+                .withMaxRecord(256)
+                .build()
             .sortIn(source)
             .sort()
             .firstDup()
@@ -296,7 +329,9 @@ public class TestSort {
             bw.newLine();
         }
         final File target = File.createTempFile("sort-", ".txt");
-        SortEngine.using(256)
+        SortEngine.builder()
+                .withMaxRecord(256)
+                .build()
             .sortIn(source)
             .sort()
             .lastDup()
