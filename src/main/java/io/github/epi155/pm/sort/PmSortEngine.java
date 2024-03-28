@@ -366,12 +366,12 @@ class PmSortEngine implements LayerSortIn {
                     if (includeFilter == null || includeFilter.test(line)) {
                         if (inRecFcn != null)
                             line = inRecFcn.apply(line);
-                        data.add(line);
                         if (data.size() >= maxNumRecord) {
                             File chunk = sortAndSave(data);
                             splitFiles.add(chunk);
                             data.clear();
                         }
+                        data.add(line);
                         return true;
                     } else {
                         return false;
