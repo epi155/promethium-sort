@@ -86,7 +86,23 @@ public class SortEngine {
     }
 
     /**
-     * Sort builder creator
+     * Sort builder creator.<br>
+     * A {@link SortBuilder} allows you to set all sort context parameters
+     * <p>
+     * Example:
+     * <pre>
+     * SortEngine.builder()
+     *          .withMaxRecord(2000)
+     *          .withCharset(StandardCharsets.US_ASCII)
+     *          .withMaxThread(4)
+     *          .withTempDirectory("/var/tmp/")
+     *          .build()
+     *      .sortIn(source)
+     *      .sort()
+     *      .sortOut(target);
+     * </pre>
+     * As in every builder each {@code with*(*)} is optional
+     *
      * @return instance of {@link SortBuilderRecord}
      */
     public static SortBuilderRecord builder() {
@@ -98,6 +114,7 @@ public class SortEngine {
      *
      * @param maxNumRecord max record sorted in memory
      * @return {@link LayerSortIn} instance
+     * @see SortEngine#builder()
      */
     public static LayerSortIn using(int maxNumRecord) {
         return new PmSortEngine(maxNumRecord, null, 0,  null);

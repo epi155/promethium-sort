@@ -13,4 +13,12 @@ public interface SortBuilderWork extends SortBuilder {
      * @return instance of {@link SortBuilder}
      */
     SortBuilder withTempDirectory(File tempDirectory);
+
+    /**
+     * Set directory for temporary files (default ENV {@code java.io.tmpdir})
+     *
+     * @param tempDirectory temp Directory
+     * @return instance of {@link SortBuilder}
+     */
+    SortBuilder withTempDirectory(String tempDirectory);
 }

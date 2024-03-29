@@ -37,4 +37,10 @@ class PmSortBuilder implements SortBuilderRecord {
         this.swap = tempDirectory;
         return this;
     }
+
+    @Override
+    public SortBuilder withTempDirectory(String tempDirectory) {
+        this.swap = new File(tempDirectory);
+        return this;
+    }
 }
